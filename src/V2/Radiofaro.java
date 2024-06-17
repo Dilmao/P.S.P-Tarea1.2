@@ -1,7 +1,7 @@
 package V2;
 
 public class Radiofaro implements Runnable {
-    private final Integer PAUSA_RADIOFARO = 2_000;
+    private static final int PAUSA_RADIOFARO = 2_000;
     private final Buzon a_Buzon;
     private final String a_ID;
 
@@ -12,22 +12,28 @@ public class Radiofaro implements Runnable {
 
     @Override
     public void run() {
-        // COMENTARIO.
+        // Variables.
         String mensaje = a_ID + " > ";
+        boolean l_EjecucionIniciada = a_Buzon.iniciarEjecucion();
 
-        // COMENTARIO.
-        if (!a_Buzon.a_Ejecucion) {
-            a_Buzon.a_Ejecucion = true;
-            mensaje += "No colisiona";
-        } else mensaje += "Colisiona";
+        // Determinar el mensaje según si la ejecución se inició sin colisión.
+        if (l_EjecucionIniciada) mensaje += "No colisiona";
+        else mensaje += "Colisiona";
+
+        // Imprimir la hora y el mensaje correspondiente.
         a_Buzon.imprimirHora(mensaje);
 
-        // COMENTARIO.
+        // Intentar poner en pausa la ejecución.
         try {
             Thread.sleep(PAUSA_RADIOFARO);
-            a_Buzon.a_Ejecucion = false;
         } catch (InterruptedException p_Exception) {
+            // Manejar la excepción de interrupción del hilo.
             System.out.println(">>> Error: Ha falado el sleep(): " + p_Exception);
+        } finally {
+            // Finalizar la ejecución si fue iniciada correctamente.
+            if (l_EjecucionIniciada) {
+                a_Buzon.finalizarEjecucion();
+            }
         }
     }
 }
